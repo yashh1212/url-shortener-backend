@@ -4,15 +4,12 @@ const cors = require("cors");
 const shortid = require("shortid");
 const validUrl = require("valid-url");
 const serverless = require("serverless-http");
-
 require("dotenv").config();
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
-const PORT = process.env.PORT ;
- 
 
 mongoose
   .connect(process.env.Mongo_url, {
@@ -31,12 +28,13 @@ const urlSchema = new mongoose.Schema({
 });
 
 const Url = mongoose.model("Url", urlSchema);
-
+app.get("/api/", () => {
+  res.send("hello");
+});
 app.post("/api/shorten", async (req, res) => {
   const { longUrl } = req.body;
-  const baseUrl = `http://localhost:${PORT}`;
+  const baseUrl = `http://localhost:${process.env.PORT}`;
 
-  // Check if the provided URL is valid
   if (!validUrl.isUri(longUrl)) {
     return res.status(400).json({ error: "Invalid URL" });
   }
@@ -100,5 +98,4 @@ app.get("/api/url/:code", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 module.exports = app;
