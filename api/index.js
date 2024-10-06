@@ -10,7 +10,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-
+const port = process.env.PORT;
 mongoose
   .connect(process.env.Mongo_url, {
     useNewUrlParser: true,
@@ -97,5 +97,5 @@ app.get("/api/url/:code", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
+app.listen(port,()=>{console.log(`server running on ${port}`)});
 module.exports = app;
