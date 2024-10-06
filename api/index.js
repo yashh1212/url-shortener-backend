@@ -11,6 +11,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 const port = process.env.PORT;
+
 mongoose
   .connect(process.env.Mongo_url, {
     useNewUrlParser: true,
@@ -28,12 +29,15 @@ const urlSchema = new mongoose.Schema({
 });
 
 const Url = mongoose.model("Url", urlSchema);
-app.get("/api/", () => {
+
+app.get("/api/", (req, res) => {
   res.send("hello");
 });
+
 app.post("/api/shorten", async (req, res) => {
   const { longUrl } = req.body;
-  const baseUrl = `http://localhost:${process.env.PORT}`;
+
+   const baseUrl = `${req.protocol}://${req.get("host")}`;
 
   if (!validUrl.isUri(longUrl)) {
     return res.status(400).json({ error: "Invalid URL" });
@@ -59,6 +63,7 @@ app.post("/api/shorten", async (req, res) => {
       res.json(url);
     }
   } catch (err) {
+    console.error(err); 
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -75,6 +80,7 @@ app.get("/:code", async (req, res) => {
       return res.status(404).json({ error: "No URL found" });
     }
   } catch (err) {
+    console.error(err); 
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -94,8 +100,13 @@ app.get("/api/url/:code", async (req, res) => {
       res.status(404).json({ error: "No URL found" });
     }
   } catch (err) {
+    console.error(err); 
     res.status(500).json({ error: "Server error" });
   }
 });
-app.listen(port,()=>{console.log(`server running on ${port}`)});
+
+app.listen(port, () => {
+  console.log(`Server running on ${port}`);
+});
+
 module.exports = app;
